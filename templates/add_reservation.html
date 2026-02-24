@@ -3,50 +3,105 @@
 {% block title %}新增預訂 - {{ restaurant_name }}{% endblock %}
 
 {% block content %}
-    <div class="cp-header">
-        <h1 class="cp-title">➕ 新增預訂</h1>
-    </div>
-    
-    <div class="cp-card" style="max-width: 600px;">
+<h1 class="page-title">➕ 新增預訂</h1>
+
+<div class="custom-card" style="max-width: 600px;">
+    <div class="card-body">
         <form method="POST">
-            <div class="mb-3">
-                <label class="cp-form-label">姓名 *</label>
-                <input type="text" name="name" class="cp-form-control" required>
+            <div class="form-group mb-3">
+                <label class="form-label">姓名 *</label>
+                <input type="text" name="name" class="form-control" required>
             </div>
-            <div class="mb-3">
-                <label class="cp-form-label">電話 *</label>
-                <input type="tel" name="phone" class="cp-form-control" pattern="[0-9]{8,}" required>
+            
+            <div class="form-group mb-3">
+                <label class="form-label">電話 *</label>
+                <input type="tel" name="phone" class="form-control" pattern="[0-9]{8,}" required>
             </div>
-            <div class="mb-3">
-                <label class="cp-form-label">電郵</label>
-                <input type="email" name="email" class="cp-form-control">
+            
+            <div class="form-group mb-3">
+                <label class="form-label">電郵</label>
+                <input type="email" name="email" class="form-control">
             </div>
+            
             <div class="row mb-3">
                 <div class="col">
-                    <label class="cp-form-label">日期 *</label>
-                    <input type="date" name="date" class="cp-form-control" required>
+                    <div class="form-group">
+                        <label class="form-label">日期 *</label>
+                        <input type="date" name="date" class="form-control" required>
+                    </div>
                 </div>
                 <div class="col">
-                    <label class="cp-form-label">時間 *</label>
-                    <input type="time" name="time" class="cp-form-control" required>
+                    <div class="form-group">
+                        <label class="form-label">時間 *</label>
+                        <input type="time" name="time" class="form-control" required>
+                    </div>
                 </div>
             </div>
-            <div class="mb-3">
-                <label class="cp-form-label">人數</label>
-                <input type="number" name="party_size" class="cp-form-control" value="1" min="1">
+            
+            <div class="form-group mb-3">
+                <label class="form-label">人數</label>
+                <input type="number" name="party_size" class="form-control" value="1" min="1">
             </div>
-            <div class="mb-3">
-                <label class="cp-form-label">座位</label>
-                <input type="text" name="table_number" class="cp-form-control">
+            
+            <div class="form-group mb-3">
+                <label class="form-label">座位</label>
+                <input type="text" name="table_number" class="form-control" placeholder="例如：A1, B2">
             </div>
-            <div class="mb-3">
-                <label class="cp-form-label">備註</label>
-                <textarea name="note" class="cp-form-control" rows="2"></textarea>
+            
+            <div class="form-group mb-3">
+                <label class="form-label">狀態</label>
+                <select name="status" class="form-select">
+                    <option value="booked">📋 已預約</option>
+                    <option value="confirmed">✅ 確認訂座</option>
+                    <option value="seated">👥 已入座</option>
+                    <option value="completed">✔ 完成</option>
+                    <option value="no_show">❌ No-Show</option>
+                    <option value="cancelled">🚫 已取消</option>
+                </select>
             </div>
-            <div style="display: flex; gap: 0.75rem;">
-                <button type="submit" class="cp-btn cp-btn-primary">確認</button>
-                <a href="{{ url_for('reservations') }}" class="cp-btn cp-btn-secondary">取消</a>
+            
+            <div class="form-group mb-3">
+                <label class="form-label">備註</label>
+                <textarea name="note" class="form-control" rows="3" placeholder="特殊要求、禁忌等..."></textarea>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg me-1"></i>確認
+                </button>
+                <a href="{{ url_for('reservations') }}" class="btn btn-outline-secondary">取消</a>
             </div>
         </form>
     </div>
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 16px;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: var(--text-color);
+    }
+    
+    .form-control, .form-select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 1rem;
+        background: var(--card-bg);
+        color: var(--text-color);
+        transition: all 0.2s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+</style>
 {% endblock %}

@@ -54,12 +54,18 @@
                     <td><span class="party-size">{{ res.party_size }}位</span></td>
                     <td>{{ res.table_number or '-' }}</td>
                     <td>
-                        {% if res.status == 'confirmed' %}
-                        <span class="status-badge confirmed"><i class="bi bi-check-circle me-1"></i>確認</span>
+                        {% if res.status == 'booked' %}
+                        <span class="status-badge booked"><i class="bi bi-bookmark me-1"></i>已預約</span>
+                        {% elif res.status == 'confirmed' %}
+                        <span class="status-badge confirmed"><i class="bi bi-check-circle me-1"></i>確認訂座</span>
                         {% elif res.status == 'seated' %}
                         <span class="status-badge seated"><i class="bi bi-people me-1"></i>已入座</span>
+                        {% elif res.status == 'completed' %}
+                        <span class="status-badge completed"><i class="bi bi-check2-all me-1"></i>完成</span>
                         {% elif res.status == 'no_show' %}
                         <span class="status-badge no-show"><i class="bi bi-x-circle me-1"></i>No-Show</span>
+                        {% elif res.status == 'cancelled' %}
+                        <span class="status-badge cancelled"><i class="bi bi-x-lg me-1"></i>已取消</span>
                         {% else %}
                         <span class="status-badge">{{ res.status }}</span>
                         {% endif %}
@@ -159,6 +165,11 @@
         font-weight: 500;
     }
     
+    .status-badge.booked {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
     .status-badge.confirmed {
         background: #d1fae5;
         color: #065f46;
@@ -169,8 +180,20 @@
         color: #1e40af;
     }
     
+    .status-badge.completed {
+        background: #e0e7ff;
+        color: #4338ca;
+    }
+    
     .status-badge.no-show {
         background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .status-badge.cancelled {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
         color: #991b1b;
     }
     
