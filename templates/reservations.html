@@ -50,7 +50,11 @@
                             <span class="customer-name">{{ res.name }}</span>
                         </div>
                     </td>
-                    <td><i class="bi bi-telephone me-1 text-muted"></i>{{ res.phone }}</td>
+                    <td><i class="bi bi-telephone me-1 text-muted"></i>{{ res.phone }}
+                        {% if reservation_counts[res.phone] > 1 %}
+                        <span class="res-count" title="總預訂次數"> (#{{ reservation_counts[res.phone] }}次)</span>
+                        {% endif %}
+                    </td>
                     <td><span class="party-size">{{ res.party_size }}位</span></td>
                     <td>{{ res.table_number or '-' }}</td>
                     <td>
@@ -233,6 +237,12 @@
     
     .quick-actions .dropdown-item:hover {
         background: #f3f4f6;
+    }
+    
+    .res-count {
+        font-size: 0.75rem;
+        color: #667eea;
+        font-weight: 500;
     }
     
     .status-badge.booked {

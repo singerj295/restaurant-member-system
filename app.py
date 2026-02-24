@@ -838,8 +838,16 @@ def reservations():
     
     reservations_list = query.order_by(Reservation.date.desc()).limit(50).all()
     
+    # 計算每個電話既預訂次數
+    reservation_counts = {}
+    for res in reservations_list:
+        phone = res.phone
+        if phone:
+            if phone not in reservation_counts:
+                reservation_counts[phone] = db.query(Reservation).filter(Reservation.phone == phone).count()
+    
     db.close()
-    return render_template('reservations.html', reservations=reservations_list, search=search)
+    return render_template('reservations.html', reservations=reservations_list, search=search, reservation_counts=reservation_counts)
 
 # --- 預訂日曆 ---
 @app.route('/reservations/calendar')
