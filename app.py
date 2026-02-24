@@ -883,16 +883,37 @@ def add_reservation():
     if request.method == 'POST':
         name = request.form['name']
         phone = request.form['phone']
+        email = request.form.get('email', '')
         date = datetime.strptime(request.form['date'] + ' ' + request.form['time'], '%Y-%m-%d %H:%M')
         
+        # 檢查電話是否已存在於顧客資料庫
+        customer = db.query(Customer).filter(Customer.phone == phone).first()
+        
+        if not customer:
+            # 如果唔存在，自動新增顧客
+            customer = Customer(
+                name=name,
+                phone=phone,
+                email=email,
+                visits=0,
+                total_spent=0,
+                avg_spend=0
+            )
+            db.add(customer)
+            db.commit()
+            db.refresh(customer)
+        
+        # 建立預訂並連結顧客
         reservation = Reservation(
             name=name,
             phone=phone,
-            email=request.form.get('email', ''),
+            email=email,
             date=date,
             party_size=int(request.form.get('party_size', 1)),
             table_number=request.form.get('table_number', ''),
+            status=request.form.get('status', 'booked'),
             note=request.form.get('note', ''),
+            customer_id=customer.id if customer else None,
             created_by_employee_id=session['employee_id']
         )
         
