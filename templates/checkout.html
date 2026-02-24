@@ -5,45 +5,254 @@
 {% block content %}
 <h1 class="page-title">💰 結帳</h1>
 
-<div class="custom-card" style="max-width: 600px;">
-    <div class="card-body">
-        <form method="POST">
-            <div class="mb-4">
-                <label class="form-label" style="font-weight: 500;">電話搜尋會員</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" name="phone" class="form-control" placeholder="輸入電話號碼">
-                    <button type="submit" class="btn btn-outline-secondary">搜尋</button>
+<div class="checkout-container">
+    <div class="row">
+        <!-- Left: Member Selection -->
+        <div class="col-md-6 mb-4">
+            <div class="checkout-card">
+                <div class="checkout-header">
+                    <i class="bi bi-person-badge"></i>
+                    <span>會員資料</span>
+                </div>
+                <div class="checkout-body">
+                    <div class="form-group">
+                        <label class="form-label">電話搜尋會員</label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-search"></i>
+                            <input type="text" name="phone" class="form-control" placeholder="輸入電話號碼搜尋">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">選擇會員</label>
+                        <select name="member_id" class="form-select">
+                            <option value="">-- 無會員 --</option>
+                            {% for member in members %}
+                            <option value="{{ member.id }}">{{ member.name }} - {{ member.tier }} (餘額: ${{ "%.2f"|format(member.balance) }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             </div>
-            
-            <div class="mb-4">
-                <label class="form-label" style="font-weight: 500;">選擇會員</label>
-                <select name="member_id" class="form-select">
-                    <option value="">-- 無會員 --</option>
-                    {% for member in members %}
-                    <option value="{{ member.id }}">{{ member.name }} - {{ member.tier }} (餘額: ${{ "%.2f"|format(member.balance) }})</option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div class="mb-4">
-                <label class="form-label" style="font-weight: 500;">消費金額 ($)</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
-                    <input type="number" name="original_amount" class="form-control" step="0.01" required>
+        </div>
+        
+        <!-- Right: Amount -->
+        <div class="col-md-6 mb-4">
+            <div class="checkout-card">
+                <div class="checkout-header">
+                    <i class="bi bi-cash-stack"></i>
+                    <span>消費金額</span>
+                </div>
+                <div class="checkout-body">
+                    <div class="amount-display">
+                        <span class="currency">$</span>
+                        <input type="number" name="original_amount" class="amount-input" placeholder="0" step="0.01" required>
+                    </div>
+                    
+                    <!-- Quick Amount Buttons -->
+                    <div class="quick-amounts">
+                        <button type="button" class="quick-amount" data-amount="50">$50</button>
+                        <button type="button" class="quick-amount" data-amount="100">$100</button>
+                        <button type="button" class="quick-amount" data-amount="200">$200</button>
+                        <button type="button" class="quick-amount" data-amount="500">$500</button>
+                    </div>
+                    
+                    <div class="form-check mt-3">
+                        <input type="checkbox" class="form-check-input" id="useBalance" name="use_balance">
+                        <label class="form-check-label" for="useBalance">用儲值餘額扣款</label>
+                    </div>
+                    
+                    <button type="submit" class="btn-checkout">
+                        <i class="bi bi-check-lg"></i>確認結帳
+                    </button>
                 </div>
             </div>
-            
-            <div class="mb-4 form-check">
-                <input type="checkbox" class="form-check-input" id="useBalance" name="use_balance">
-                <label class="form-check-label" for="useBalance">用儲值餘額扣款</label>
-            </div>
-            
-            <button type="submit" class="btn btn-success btn-lg">
-                <i class="bi bi-check-lg me-2"></i>確認結帳
-            </button>
-        </form>
+        </div>
     </div>
 </div>
+
+<style>
+    .checkout-container {
+        max-width: 900px;
+    }
+    
+    .checkout-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: hidden;
+        height: 100%;
+    }
+    
+    .checkout-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 16px 20px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .checkout-header i {
+        font-size: 1.3rem;
+    }
+    
+    .checkout-body {
+        padding: 24px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--text-color);
+    }
+    
+    .input-with-icon {
+        position: relative;
+    }
+    
+    .input-with-icon i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+    
+    .form-control, .form-select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 1rem;
+        background: var(--card-bg);
+        color: var(--text-color);
+        transition: all 0.2s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+    
+    .input-with-icon .form-control {
+        padding-left: 42px;
+    }
+    
+    .amount-display {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 30px;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .currency {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #64748b;
+    }
+    
+    .amount-input {
+        border: none;
+        background: transparent;
+        font-size: 3rem;
+        font-weight: 700;
+        color: #1e293b;
+        text-align: center;
+        width: 200px;
+    }
+    
+    .amount-input:focus {
+        outline: none;
+    }
+    
+    .amount-input::placeholder {
+        color: #cbd5e1;
+    }
+    
+    .quick-amounts {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .quick-amount {
+        padding: 10px 20px;
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        background: var(--card-bg);
+        color: var(--text-color);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .quick-amount:hover {
+        border-color: #667eea;
+        background: #667eea;
+        color: white;
+    }
+    
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .form-check-input {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    
+    .form-check-label {
+        cursor: pointer;
+    }
+    
+    .btn-checkout {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .btn-checkout:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+    }
+</style>
+
+<script>
+    // Quick amount buttons
+    document.querySelectorAll('.quick-amount').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const amount = btn.dataset.amount;
+            document.querySelector('.amount-input').value = amount;
+        });
+    });
+</script>
 {% endblock %}

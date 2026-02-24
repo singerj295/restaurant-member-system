@@ -214,12 +214,138 @@
             color: var(--text-color);
         }
         
-        /* Responsive */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             #sidebar { width: var(--sidebar-collapsed); }
             #sidebarToggle { left: var(--sidebar-collapsed); }
-            #mainContent { margin-left: var(--sidebar-collapsed); }
-            .top-bar { left: var(--sidebar-collapsed); }
+            #mainContent { 
+                margin-left: var(--sidebar-collapsed); 
+                padding: 16px;
+            }
+            .top-bar { 
+                left: var(--sidebar-collapsed);
+                padding: 0 16px;
+            }
+            
+            /* Stack columns on mobile */
+            .row > [class*="col-"] {
+                margin-bottom: 16px;
+            }
+            
+            /* Stats cards - stack on mobile */
+            .stats-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 16px;
+            }
+            
+            /* Tables - horizontal scroll */
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Buttons - larger touch targets */
+            .btn {
+                padding: 12px 20px;
+                min-height: 44px;
+            }
+            
+            /* Form inputs */
+            .form-control, .form-select {
+                padding: 14px;
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+            
+            /* Page title */
+            .page-title {
+                font-size: 1.4rem;
+            }
+            
+            /* Search box */
+            .search-box {
+                width: 100% !important;
+            }
+            
+            /* Quick actions */
+            .d-flex.flex-wrap {
+                flex-direction: column !important;
+            }
+            
+            .d-flex.flex-wrap .btn {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+            
+            /* Cards */
+            .custom-card {
+                border-radius: 12px;
+                margin-bottom: 16px;
+            }
+            
+            /* Checkout */
+            .checkout-card {
+                margin-bottom: 16px;
+            }
+            
+            .amount-display {
+                padding: 20px;
+            }
+            
+            .amount-input {
+                font-size: 2rem;
+                width: 150px;
+            }
+            
+            /* Action buttons */
+            .action-buttons {
+                flex-wrap: wrap;
+            }
+            
+            /* Top bar */
+            .theme-toggle {
+                padding: 8px;
+            }
+            
+            .theme-toggle span {
+                display: none;
+            }
+        }
+        
+        /* Small mobile */
+        @media (max-width: 480px) {
+            #mainContent {
+                padding: 12px;
+            }
+            
+            .stats-card {
+                padding: 12px;
+            }
+            
+            .stats-number {
+                font-size: 1.5rem;
+            }
+            
+            .page-title {
+                font-size: 1.25rem;
+            }
+        }
+        
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .btn, .btn-action, .quick-amount {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            .form-control, .form-select {
+                min-height: 44px;
+            }
+            
+            /* Remove hover effects on touch devices */
+            .custom-table tbody tr:hover {
+                background: transparent;
+            }
         }
     </style>
 </head>

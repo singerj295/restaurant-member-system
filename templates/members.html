@@ -6,59 +6,244 @@
 <h1 class="page-title">會員管理</h1>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <div></div>
+    <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="搜尋會員..." class="search-input">
+    </div>
     <a href="{{ url_for('add_member') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>新增會員
     </a>
 </div>
 
 <div class="custom-card">
-    <div class="card-body p-0">
+    <div class="table-responsive">
         <table class="custom-table">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th style="width: 60px;">ID</th>
                     <th>姓名</th>
                     <th>電話</th>
                     <th>等級</th>
                     <th>儲值</th>
                     <th>狀態</th>
-                    <th>操作</th>
+                    <th style="width: 180px;">操作</th>
                 </tr>
             </thead>
             <tbody>
                 {% for member in members %}
                 <tr>
-                    <td>#{{ member.id }}</td>
-                    <td style="font-weight: 500;">{{ member.name }}</td>
-                    <td>{{ member.phone }}</td>
+                    <td><span class="member-id">#{{ member.id }}</span></td>
+                    <td>
+                        <div class="member-info">
+                            <div class="member-avatar" style="background: linear-gradient(135deg, #{{ ['3b82f6', '10b981', 'f59e0b', '8b5cf6', 'ef4444']|random }} , #{{ ['1d4ed8', '047857', 'd97706', '6d28d9', 'dc2626']|random }});">
+                                {{ member.name[0] }}
+                            </div>
+                            <span class="member-name">{{ member.name }}</span>
+                        </div>
+                    </td>
+                    <td><i class="bi bi-telephone me-1 text-muted"></i>{{ member.phone }}</td>
                     <td>
                         {% if member.tier == '黑鑽會員' %}
-                        <span class="badge bg-warning text-dark">💎 黑鑽</span>
+                        <span class="badge-tier diamond">💎 黑鑽</span>
                         {% else %}
-                        <span class="badge bg-secondary">普通</span>
+                        <span class="badge-tier normal">普通</span>
                         {% endif %}
                     </td>
-                    <td style="font-weight: 600; color: #10b981;">${{ "%.0f"|format(member.balance) }}</td>
+                    <td><span class="balance">${{ "%.0f"|format(member.balance) }}</span></td>
                     <td>
                         {% if member.is_active %}
-                        <span class="badge bg-success">有效</span>
+                        <span class="status-badge active"><i class="bi bi-check-circle me-1"></i>有效</span>
                         {% else %}
-                        <span class="badge bg-danger">過期</span>
+                        <span class="status-badge inactive"><i class="bi bi-x-circle me-1"></i>過期</span>
                         {% endif %}
                     </td>
                     <td>
-                        <a href="{{ url_for('edit_member', member_id=member.id) }}" class="btn btn-sm btn-outline-primary">編輯</a>
-                        <a href="{{ url_for('topup_member', member_id=member.id) }}" class="btn btn-sm btn-outline-success">儲值</a>
+                        <div class="action-buttons">
+                            <a href="{{ url_for('edit_member', member_id=member.id) }}" class="btn-action edit" title="編輯">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{{ url_for('topup_member', member_id=member.id) }}" class="btn-action topup" title="儲值">
+                                <i class="bi bi-plus-circle"></i>
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="7" class="text-center text-muted py-5">暫無會員</td>
+                    <td colspan="7" class="empty-state">
+                        <i class="bi bi-inbox"></i>
+                        <p>暫無會員</p>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<style>
+    .search-box {
+        position: relative;
+        width: 300px;
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 10px 14px 10px 40px;
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 0.95rem;
+        background: var(--card-bg);
+        color: var(--text-color);
+        transition: all 0.2s;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+    
+    .member-id {
+        color: #9ca3af;
+        font-size: 0.9rem;
+    }
+    
+    .member-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .member-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .member-name {
+        font-weight: 500;
+    }
+    
+    .badge-tier {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .badge-tier.diamond {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        color: #92400e;
+    }
+    
+    .badge-tier.normal {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+    
+    .balance {
+        font-weight: 600;
+        color: #10b981;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .status-badge.active {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-badge.inactive {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-action.edit {
+        background: #eff6ff;
+        color: #3b82f6;
+    }
+    
+    .btn-action.edit:hover {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .btn-action.topup {
+        background: #ecfdf5;
+        color: #10b981;
+    }
+    
+    .btn-action.topup:hover {
+        background: #10b981;
+        color: white;
+    }
+    
+    .custom-table tbody tr {
+        transition: background 0.2s;
+    }
+    
+    .custom-table tbody tr:nth-child(even) {
+        background: rgba(0,0,0,0.02);
+    }
+    
+    .custom-table tbody tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px !important;
+        color: #9ca3af;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 16px;
+        display: block;
+    }
+    
+    .empty-state p {
+        margin: 0;
+        font-size: 1rem;
+    }
+</style>
 {% endblock %}

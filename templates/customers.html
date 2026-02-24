@@ -6,47 +6,193 @@
 <h1 class="page-title">顧客管理</h1>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <div></div>
+    <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="搜尋顧客..." class="search-input">
+    </div>
     <a href="{{ url_for('add_customer') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>新增顧客
     </a>
 </div>
 
 <div class="custom-card">
-    <div class="card-body p-0">
+    <div class="table-responsive">
         <table class="custom-table">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th style="width: 60px;">ID</th>
                     <th>姓名</th>
                     <th>電話</th>
                     <th>電郵</th>
                     <th>總消費</th>
-                    <th>操作</th>
+                    <th style="width: 200px;">操作</th>
                 </tr>
             </thead>
             <tbody>
                 {% for customer in customers %}
                 <tr>
-                    <td>#{{ customer.id }}</td>
-                    <td style="font-weight: 500;">{{ customer.name }}</td>
-                    <td>{{ customer.phone }}</td>
-                    <td>{{ customer.email or '-' }}</td>
-                    <td style="font-weight: 600; color: #10b981;">${{ "%.0f"|format(customer.total_spent) }}</td>
+                    <td><span class="customer-id">#{{ customer.id }}</span></td>
                     <td>
-                        <a href="{{ url_for('customer_visits', customer_id=customer.id) }}" class="btn btn-sm btn-outline-info" title="消費記錄">📝</a>
-                        <a href="{{ url_for('customer_interactions', customer_id=customer.id) }}" class="btn btn-sm btn-outline-secondary" title="聯繫記錄">📞</a>
-                        <a href="{{ url_for('upgrade_to_member', customer_id=customer.id) }}" class="btn btn-sm btn-outline-warning" title="升級為會員">⬆️</a>
-                        <a href="{{ url_for('edit_customer', customer_id=customer.id) }}" class="btn btn-sm btn-outline-primary">編輯</a>
+                        <div class="customer-info">
+                            <div class="customer-avatar" style="background: linear-gradient(135deg, #{{ ['ec4899', '14b8a6', 'f97316', '6366f1', '84cc16']|random }}, #{{ ['be185d', #0d9488', #ea580c', #4f46e5', #65a30d']|random }});">
+                                {{ customer.name[0] }}
+                            </div>
+                            <span class="customer-name">{{ customer.name }}</span>
+                        </div>
+                    </td>
+                    <td><i class="bi bi-telephone me-1 text-muted"></i>{{ customer.phone }}</td>
+                    <td>{{ customer.email or '-' }}</td>
+                    <td><span class="spent">${{ "%.0f"|format(customer.total_spent) }}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{{ url_for('customer_visits', customer_id=customer.id) }}" class="btn-action note" title="消費記錄">
+                                <i class="bi bi-journal-text"></i>
+                            </a>
+                            <a href="{{ url_for('customer_interactions', customer_id=customer.id) }}" class="btn-action call" title="聯繫記錄">
+                                <i class="bi bi-telephone"></i>
+                            </a>
+                            <a href="{{ url_for('upgrade_to_member', customer_id=customer.id) }}" class="btn-action upgrade" title="升級為會員">
+                                <i class="bi bi-arrow-up-circle"></i>
+                            </a>
+                            <a href="{{ url_for('edit_customer', customer_id=customer.id) }}" class="btn-action edit" title="編輯">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-5">暫無顧客</td>
+                    <td colspan="6" class="empty-state">
+                        <i class="bi bi-inbox"></i>
+                        <p>暫無顧客</p>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<style>
+    .search-box {
+        position: relative;
+        width: 300px;
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 10px 14px 10px 40px;
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 0.95rem;
+        background: var(--card-bg);
+        color: var(--text-color);
+        transition: all 0.2s;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+    
+    .customer-id {
+        color: #9ca3af;
+        font-size: 0.9rem;
+    }
+    
+    .customer-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .customer-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .customer-name {
+        font-weight: 500;
+    }
+    
+    .spent {
+        font-weight: 600;
+        color: #10b981;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 6px;
+    }
+    
+    .btn-action {
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+    }
+    
+    .btn-action.note { background: #fef3c7; color: #d97706; }
+    .btn-action.note:hover { background: #d97706; color: white; }
+    
+    .btn-action.call { background: #e0e7ff; color: #6366f1; }
+    .btn-action.call:hover { background: #6366f1; color: white; }
+    
+    .btn-action.upgrade { background: #d1fae5; color: #10b981; }
+    .btn-action.upgrade:hover { background: #10b981; color: white; }
+    
+    .btn-action.edit { background: #eff6ff; color: #3b82f6; }
+    .btn-action.edit:hover { background: #3b82f6; color: white; }
+    
+    .custom-table tbody tr {
+        transition: background 0.2s;
+    }
+    
+    .custom-table tbody tr:nth-child(even) {
+        background: rgba(0,0,0,0.02);
+    }
+    
+    .custom-table tbody tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px !important;
+        color: #9ca3af;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 16px;
+        display: block;
+    }
+    
+    .empty-state p {
+        margin: 0;
+        font-size: 1rem;
+    }
+</style>
 {% endblock %}

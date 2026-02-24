@@ -6,14 +6,17 @@
 <h1 class="page-title">預訂管理</h1>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <div></div>
+    <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="搜尋預訂..." class="search-input">
+    </div>
     <a href="{{ url_for('add_reservation') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>新增預訂
     </a>
 </div>
 
 <div class="custom-card">
-    <div class="card-body p-0">
+    <div class="table-responsive">
         <table class="custom-table">
             <thead>
                 <tr>
@@ -28,30 +31,171 @@
             <tbody>
                 {% for res in reservations %}
                 <tr>
-                    <td style="font-weight: 500;">{{ res.date.strftime('%Y-%m-%d %H:%M') }}</td>
-                    <td>{{ res.name }}</td>
-                    <td>{{ res.phone }}</td>
-                    <td>{{ res.party_size }}</td>
+                    <td>
+                        <div class="datetime">
+                            <span class="date">{{ res.date.strftime('%Y-%m-%d') }}</span>
+                            <span class="time">{{ res.date.strftime('%H:%M') }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="customer-info">
+                            <div class="customer-avatar" style="background: linear-gradient(135deg, #f472b6, #db2777);">
+                                {{ res.name[0] }}
+                            </div>
+                            <span class="customer-name">{{ res.name }}</span>
+                        </div>
+                    </td>
+                    <td><i class="bi bi-telephone me-1 text-muted"></i>{{ res.phone }}</td>
+                    <td><span class="party-size">{{ res.party_size }}位</span></td>
                     <td>{{ res.table_number or '-' }}</td>
                     <td>
                         {% if res.status == 'confirmed' %}
-                        <span class="badge bg-primary">確認</span>
+                        <span class="status-badge confirmed"><i class="bi bi-check-circle me-1"></i>確認</span>
                         {% elif res.status == 'seated' %}
-                        <span class="badge bg-success">已入座</span>
+                        <span class="status-badge seated"><i class="bi bi-people me-1"></i>已入座</span>
                         {% elif res.status == 'no_show' %}
-                        <span class="badge bg-danger">No-Show</span>
+                        <span class="status-badge no-show"><i class="bi bi-x-circle me-1"></i>No-Show</span>
                         {% else %}
-                        <span class="badge bg-secondary">{{ res.status }}</span>
+                        <span class="status-badge">{{ res.status }}</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-5">暫無預訂</td>
+                    <td colspan="6" class="empty-state">
+                        <i class="bi bi-inbox"></i>
+                        <p>暫無預訂</p>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<style>
+    .search-box {
+        position: relative;
+        width: 300px;
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 10px 14px 10px 40px;
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 0.95rem;
+        background: var(--card-bg);
+        color: var(--text-color);
+        transition: all 0.2s;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+    
+    .datetime {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .datetime .date {
+        font-weight: 500;
+    }
+    
+    .datetime .time {
+        font-size: 0.9rem;
+        color: #3b82f6;
+        font-weight: 600;
+    }
+    
+    .customer-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .customer-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .customer-name {
+        font-weight: 500;
+    }
+    
+    .party-size {
+        font-weight: 500;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .status-badge.confirmed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-badge.seated {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .status-badge.no-show {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .custom-table tbody tr {
+        transition: background 0.2s;
+    }
+    
+    .custom-table tbody tr:nth-child(even) {
+        background: rgba(0,0,0,0.02);
+    }
+    
+    .custom-table tbody tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px !important;
+        color: #9ca3af;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 16px;
+        display: block;
+    }
+    
+    .empty-state p {
+        margin: 0;
+        font-size: 1rem;
+    }
+</style>
 {% endblock %}
