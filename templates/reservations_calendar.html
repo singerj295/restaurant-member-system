@@ -83,12 +83,44 @@
     }
     
     .calendar-day {
-        min-height: 100px;
+        min-height: 120px;
         padding: 8px;
         border-right: 1px solid var(--border-color);
         border-bottom: 1px solid var(--border-color);
         cursor: pointer;
         transition: background 0.2s;
+        overflow: hidden;
+    }
+    
+    .calendar-day.expanded {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+        min-height: 100vh;
+        overflow-y: auto;
+        background: var(--bg-color);
+        padding: 20px;
+    }
+    
+    .calendar-day .close-expand {
+        display: none;
+    }
+    
+    .calendar-day.expanded .close-expand {
+        display: block;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        z-index: 1001;
     }
     
     .calendar-day:nth-child(7n) {
@@ -154,6 +186,18 @@
         color: #991b1b;
     }
     
+    .show-more {
+        font-size: 0.7rem;
+        color: #667eea;
+        cursor: pointer;
+        padding: 2px 8px;
+        font-weight: 500;
+    }
+    
+    .show-more:hover {
+        text-decoration: underline;
+    }
+    
     .view-toggle .btn {
         border-radius: 8px;
     }
@@ -161,6 +205,7 @@
 
 <script>
     const events = {{ events|tojson }};
+    const MAX_EVENTS_PER_DAY = 3;
     
     function renderCalendar() {
         const now = new Date();
@@ -197,10 +242,34 @@
             
             // Add events for this day
             const dayEvents = events.filter(e => e.start.startsWith(dateStr));
-            dayEvents.forEach(event => {
+            
+            // Show max events, add "show more" if needed
+            const visibleEvents = dayEvents.slice(0, MAX_EVENTS_PER_DAY);
+            const hiddenCount = dayEvents.length - MAX_EVENTS_PER_DAY;
+            
+            visibleEvents.forEach(event => {
                 const time = event.start.split('T')[1].substring(0, 5);
-                eventsHtml += `<div class="event-dot ${event.status}" onclick="showEvent(${event.id})">${time} ${event.title}</div>`;
+                eventsHtml += `<div class="event-dot ${event.status}" onclick="event.stopPropagation(); showEvent(${event.id})">${time} ${event.title}</div>`;
             });
+            
+            if (hiddenCount > 0) {
+                eventsHtml += `<div class="show-more" onclick="event.stopPropagation(); showDayEvents('${dateStr}')">+${hiddenCount} 更多</div>`;
+            }
+            
+            // Click to expand/collapse
+            dayDiv.onclick = function() {
+                this.classList.toggle('expanded');
+                if (this.classList.contains('expanded')) {
+                    this.innerHTML = `<button class="close-expand" onclick="event.stopPropagation(); this.parentElement.classList.remove('expanded')">✕</button>` + 
+                        `<div class="day-number">${day}</div>` + 
+                        dayEvents.map(e => {
+                            const time = e.start.split('T')[1].substring(0, 5);
+                            return `<div class="event-dot ${e.status}" onclick="showEvent(${e.id})">${time} ${e.title}</div>`;
+                        }).join('');
+                } else {
+                    renderCalendar();
+                }
+            };
             
             dayDiv.innerHTML = eventsHtml;
             container.appendChild(dayDiv);
@@ -226,10 +295,12 @@
         const timeStr = date.toLocaleTimeString('zh-TW', {hour: '2-digit', minute:'2-digit'});
         
         const statusMap = {
-            'confirmed': '✅ 確認',
+            'booked': '📋 已預約',
+            'confirmed': '✅ 確認訂座',
             'seated': '👥 已入座',
             'completed': '✔ 完成',
-            'no_show': '❌ No-Show'
+            'no_show': '❌ No-Show',
+            'cancelled': '🚫 已取消'
         };
         
         document.getElementById('eventsModalTitle').textContent = event.title;
@@ -241,6 +312,24 @@
             <p><strong>狀態：</strong>${statusMap[event.status] || event.status}</p>
             <a href="/reservations" class="btn btn-primary mt-2">查看全部預訂</a>
         `;
+        
+        modal.show();
+    }
+    
+    function showDayEvents(dateStr) {
+        const dayEvents = events.filter(e => e.start.startsWith(dateStr));
+        const modal = new bootstrap.Modal(document.getElementById('eventsModal'));
+        
+        const date = new Date(dateStr);
+        const dateStrFormatted = date.toLocaleDateString('zh-TW');
+        
+        let eventsList = dayEvents.map(e => {
+            const time = e.start.split('T')[1].substring(0, 5);
+            return `<div class="event-dot ${e.status}" onclick="document.querySelector('.modal-footer').scrollIntoView({behavior: 'smooth'})">${time} ${e.title}</div>`;
+        }).join('');
+        
+        document.getElementById('eventsModalTitle').textContent = `${dateStrFormatted} - ${dayEvents.length}個預訂`;
+        document.getElementById('eventsModalBody').innerHTML = eventsList;
         
         modal.show();
     }
