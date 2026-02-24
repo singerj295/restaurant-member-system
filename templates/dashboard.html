@@ -46,8 +46,8 @@
                 <i class="bi bi-cash-stack"></i>
             </div>
             <div class="stats-info">
-                <span class="stats-number">$0</span>
-                <span class="stats-label">今日營業額</span>
+                <span class="stats-number">${{ "%.0f"|format(total_balance) }}</span>
+                <span class="stats-label">會員總儲值</span>
             </div>
         </div>
     </div>
@@ -92,10 +92,14 @@
                         </div>
                         <div class="reservation-meta">
                             <span class="badge bg-secondary">{{ res.party_size }}位</span>
-                            {% if res.status == 'confirmed' %}
-                            <span class="badge bg-success">確認</span>
+                            {% if res.status == 'booked' %}
+                            <span class="badge bg-warning">已預約</span>
+                            {% elif res.status == 'confirmed' %}
+                            <span class="badge bg-success">確認訂座</span>
+                            {% elif res.status == 'seated' %}
+                            <span class="badge bg-primary">已入座</span>
                             {% else %}
-                            <span class="badge bg-warning">已入座</span>
+                            <span class="badge bg-secondary">{{ res.status }}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -113,29 +117,31 @@
         <div class="custom-card">
             <div class="card-body">
                 <h5 class="card-title"><i class="bi bi-clock-history me-2"></i>最近加入</h5>
+                {% if recent_members %}
                 <div class="recent-list">
+                    {% for member in recent_members %}
                     <div class="recent-item">
-                        <div class="recent-avatar" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">陳</div>
+                        <div class="recent-avatar" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">{{ member.name[0] }}</div>
                         <div class="recent-info">
-                            <span class="recent-name">陳小明</span>
-                            <span class="recent-date">今日加入</span>
+                            <span class="recent-name">{{ member.name }}</span>
+                            <span class="recent-date">
+                                {% if member.effective_date %}
+                                    {% if member.effective_date.strftime('%Y-%m-%d') == today_str %}
+                                        今日加入
+                                    {% else %}
+                                        {{ member.effective_date.strftime('%Y-%m-%d') }}
+                                    {% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
-                    <div class="recent-item">
-                        <div class="recent-avatar" style="background: linear-gradient(135deg, #10b981, #047857);">李</div>
-                        <div class="recent-info">
-                            <span class="recent-name">李美華</span>
-                            <span class="recent-date">昨日加入</span>
-                        </div>
-                    </div>
-                    <div class="recent-item">
-                        <div class="recent-avatar" style="background: linear-gradient(135deg, #f59e0b, #d97706);">張</div>
-                        <div class="recent-info">
-                            <span class="recent-name">張志偉</span>
-                            <span class="recent-date">2日前加入</span>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
+                {% else %}
+                <p class="text-muted text-center py-4">暫無會員</p>
+                {% endif %}
             </div>
         </div>
     </div>

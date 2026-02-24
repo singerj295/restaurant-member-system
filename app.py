@@ -267,8 +267,24 @@ def dashboard():
     today_reservations = db.query(Reservation).filter(
         Reservation.date >= today,
         Reservation.date < tomorrow,
-        Reservation.status.in_(['confirmed', 'seated'])
+        Reservation.status.in_(['confirmed', 'seated', 'booked'])
     ).order_by(Reservation.date).all()
+    
+    # 今日營業額（從transactions表或顧客消費計算）
+    today_revenue = db.query(Customer).with_entities(
+        db.func.sum(Customer.total_spent)
+    ).scalar() or 0
+    
+    # 最近加入的會員
+    recent_members = db.query(Member).order_by(Member.effective_date.desc()).limit(5).all()
+    
+    # 總會員儲值
+    total_balance = db.query(Member).with_entities(
+        db.func.sum(Member.balance)
+    ).scalar() or 0
+    
+    # 今日日期字符串
+    today_str = today.strftime('%Y-%m-%d')
     
     db.close()
     return render_template('dashboard.html', 
@@ -277,7 +293,11 @@ def dashboard():
                          employee_name=employee_name,
                          restaurant_name=restaurant_name,
                          dark_mode=dark_mode,
-                         today_reservations=today_reservations)
+                         today_reservations=today_reservations,
+                         today_revenue=today_revenue,
+                         recent_members=recent_members,
+                         total_balance=total_balance,
+                         today_str=today_str)
 
 # --- 會員管理 ---
 @app.route('/members')
