@@ -10,9 +10,14 @@
         <i class="bi bi-search" style="position: absolute; left: 14px; color: #9ca3af;"></i>
         <input type="text" name="search" placeholder="搜尋顧客..." class="search-input" value="{{ search or '' }}" style="padding-left: 40px;">
     </form>
-    <a href="{{ url_for('add_customer') }}" class="btn btn-primary">
-        <i class="bi bi-plus-lg me-1"></i>新增顧客
-    </a>
+    <div>
+        <a href="{{ url_for('export_data', type='customers') }}" class="btn btn-success me-2">
+            <i class="bi bi-file-earmark-excel me-1"></i>匯出
+        </a>
+        <a href="{{ url_for('add_customer') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>新增顧客
+        </a>
+    </div>
 </div>
 
 <div class="custom-card">

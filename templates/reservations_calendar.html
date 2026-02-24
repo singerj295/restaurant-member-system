@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}預訂日曆 - {{ restaurant_name }}{% endblock %}
+
+{% block content %}
+<h1 class="page-title">📅 預訂日曆</h1>
+
+<!-- View Toggle & Actions -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="view-toggle btn-group">
+        <a href="{{ url_for('reservations') }}" class="btn btn-outline-primary">
+            <i class="bi bi-list me-1"></i>列表
+        </a>
+        <a href="{{ url_for('reservations_calendar') }}" class="btn btn-primary">
+            <i class="bi bi-calendar3 me-1"></i>日曆
+        </a>
+    </div>
+    <a href="{{ url_for('add_reservation') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>新增預訂
+    </a>
+</div>
+
+<!-- Calendar Card -->
+<div class="custom-card">
+    <div class="card-body">
+        <div class="calendar-header">
+            <h4 class="calendar-month">{{ current_month }}</h4>
+        </div>
+        
+        <div class="calendar-grid">
+            <div class="calendar-weekdays">
+                <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+            </div>
+            <div class="calendar-days" id="calendarDays">
+                <!-- Calendar days will be rendered by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Events Modal -->
+<div class="modal fade" id="eventsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventsModalTitle">預訂詳情</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="eventsModalBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .calendar-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .calendar-month {
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .calendar-grid {
+        background: var(--card-bg);
+    }
+    
+    .calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        text-align: center;
+        font-weight: 600;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+        color: #6b7280;
+    }
+    
+    .calendar-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+    }
+    
+    .calendar-day {
+        min-height: 100px;
+        padding: 8px;
+        border-right: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .calendar-day:nth-child(7n) {
+        border-right: none;
+    }
+    
+    .calendar-day:hover {
+        background: var(--border-color);
+    }
+    
+    .calendar-day.other-month {
+        opacity: 0.4;
+    }
+    
+    .calendar-day.today {
+        background: rgba(102, 126, 234, 0.1);
+    }
+    
+    .day-number {
+        font-weight: 600;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .today .day-number {
+        color: #667eea;
+    }
+    
+    .event-dot {
+        display: block;
+        padding: 4px 8px;
+        margin-bottom: 4px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    
+    .event-dot:hover {
+        transform: scale(1.02);
+    }
+    
+    .event-dot.confirmed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .event-dot.seated {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .event-dot.completed {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+    
+    .event-dot.no_show {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .view-toggle .btn {
+        border-radius: 8px;
+    }
+</style>
+
+<script>
+    const events = {{ events|tojson }};
+    
+    function renderCalendar() {
+        const now = new Date();
+        const currentMonth = '{{ current_month }}';
+        const [year, month] = currentMonth.split('-').map(Number);
+        
+        const firstDay = new Date(year, month - 1, 1);
+        const lastDay = new Date(year, month, 0);
+        const startDay = firstDay.getDay();
+        const totalDays = lastDay.getDate();
+        
+        const container = document.getElementById('calendarDays');
+        container.innerHTML = '';
+        
+        // Previous month days
+        const prevMonth = new Date(year, month - 1, 0);
+        for (let i = startDay - 1; i >= 0; i--) {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'calendar-day other-month';
+            dayDiv.innerHTML = `<div class="day-number">${prevMonth.getDate() - i}</div>`;
+            container.appendChild(dayDiv);
+        }
+        
+        // Current month days
+        for (let day = 1; day <= totalDays; day++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'calendar-day';
+            
+            const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isToday = now.getDate() === day && now.getMonth() === month - 1 && now.getFullYear() === year;
+            if (isToday) dayDiv.classList.add('today');
+            
+            let eventsHtml = `<div class="day-number">${day}</div>`;
+            
+            // Add events for this day
+            const dayEvents = events.filter(e => e.start.startsWith(dateStr));
+            dayEvents.forEach(event => {
+                const time = event.start.split('T')[1].substring(0, 5);
+                eventsHtml += `<div class="event-dot ${event.status}" onclick="showEvent(${event.id})">${time} ${event.title}</div>`;
+            });
+            
+            dayDiv.innerHTML = eventsHtml;
+            container.appendChild(dayDiv);
+        }
+        
+        // Next month days
+        const remaining = 42 - (startDay + totalDays);
+        for (let i = 1; i <= remaining; i++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'calendar-day other-month';
+            dayDiv.innerHTML = `<div class="day-number">${i}</div>`;
+            container.appendChild(dayDiv);
+        }
+    }
+    
+    function showEvent(id) {
+        const event = events.find(e => e.id === id);
+        if (!event) return;
+        
+        const modal = new bootstrap.Modal(document.getElementById('eventsModal'));
+        const date = new Date(event.start);
+        const dateStr = date.toLocaleDateString('zh-TW');
+        const timeStr = date.toLocaleTimeString('zh-TW', {hour: '2-digit', minute:'2-digit'});
+        
+        const statusMap = {
+            'confirmed': '✅ 確認',
+            'seated': '👥 已入座',
+            'completed': '✔ 完成',
+            'no_show': '❌ No-Show'
+        };
+        
+        document.getElementById('eventsModalTitle').textContent = event.title;
+        document.getElementById('eventsModalBody').innerHTML = `
+            <p><strong>日期：</strong>${dateStr}</p>
+            <p><strong>時間：</strong>${timeStr}</p>
+            <p><strong>電話：</strong>${event.phone}</p>
+            <p><strong>座位：</strong>${event.table}</p>
+            <p><strong>狀態：</strong>${statusMap[event.status] || event.status}</p>
+            <a href="/reservations" class="btn btn-primary mt-2">查看全部預訂</a>
+        `;
+        
+        modal.show();
+    }
+    
+    renderCalendar();
+</script>
+{% endblock %}

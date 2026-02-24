@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -821,6 +821,40 @@ def reservations():
     db.close()
     return render_template('reservations.html', reservations=reservations_list, search=search)
 
+# --- 預訂日曆 ---
+@app.route('/reservations/calendar')
+@login_required
+def reservations_calendar():
+    db = get_db_session()
+    
+    # 獲取本月預訂
+    today = datetime.utcnow()
+    month_start = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    if today.month == 12:
+        month_end = today.replace(year=today.year+1, month=1, day=1)
+    else:
+        month_end = today.replace(month=today.month+1, day=1)
+    
+    reservations = db.query(Reservation).filter(
+        Reservation.date >= month_start,
+        Reservation.date < month_end
+    ).all()
+    
+    # 轉換為JSON格式
+    events = []
+    for r in reservations:
+        events.append({
+            'id': r.id,
+            'title': f"{r.name} ({r.party_size}位)",
+            'start': r.date.strftime('%Y-%m-%dT%H:%M'),
+            'phone': r.phone,
+            'status': r.status,
+            'table': r.table_number or '-'
+        })
+    
+    db.close()
+    return render_template('reservations_calendar.html', events=events, current_month=today.strftime('%Y-%m'))
+
 @app.route('/reservations/add', methods=['GET', 'POST'])
 @login_required
 def add_reservation():
@@ -879,6 +913,56 @@ def delete_reservation(res_id):
     
     db.close()
     return redirect(url_for('reservations'))
+
+# --- 匯出功能 ---
+@app.route('/export/<type>')
+@login_required
+def export_data(type):
+    import io
+    from openpyxl import Workbook
+    
+    db = get_db_session()
+    wb = Workbook()
+    
+    if type == 'members':
+        ws = wb.active
+        ws.title = "會員"
+        ws.append(['ID', '姓名', '電話', '等級', '儲值', '狀態', '入會日期'])
+        members = db.query(Member).all()
+        for m in members:
+            ws.append([m.id, m.name, m.phone, m.tier, m.balance, '有效' if m.is_active else '過期', m.effective_date.strftime('%Y-%m-%d') if m.effective_date else ''])
+        filename = 'members_export.xlsx'
+    
+    elif type == 'customers':
+        ws = wb.active
+        ws.title = "顧客"
+        ws.append(['ID', '姓名', '電話', '電郵', '總消費', '訪問次數'])
+        customers = db.query(Customer).all()
+        for c in customers:
+            ws.append([c.id, c.name, c.phone, c.email or '', c.total_spent, c.visits])
+        filename = 'customers_export.xlsx'
+    
+    elif type == 'reservations':
+        ws = wb.active
+        ws.title = "預訂"
+        ws.append(['ID', '姓名', '電話', '日期', '人數', '座位', '狀態'])
+        reservations = db.query(Reservation).order_by(Reservation.date.desc()).all()
+        for r in reservations:
+            ws.append([r.id, r.name, r.phone, r.date.strftime('%Y-%m-%d %H:%M'), r.party_size, r.table_number or '', r.status])
+        filename = 'reservations_export.xlsx'
+    
+    else:
+        db.close()
+        flash('無效的匯出類型', 'error')
+        return redirect(url_for('dashboard'))
+    
+    db.close()
+    
+    buffer = io.BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+    
+    return send_file(buffer, download_name=filename, as_attachment=True)
 
 # --- 分析儀表板 ---
 @app.route('/analytics')
