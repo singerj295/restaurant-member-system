@@ -5,20 +5,8 @@
 {% block content %}
 <h1 class="page-title">📈 營業額趨勢</h1>
 
-<div class="custom-card mb-4">
-    <div class="card-body">
-        <div style="height: 400px; display: flex; align-items: center; justify-content: center;">
-            <div class="text-center">
-                <i class="bi bi-graph-up" style="font-size: 4rem; color: #667eea;"></i>
-                <p class="mt-3 text-muted">圖表功能需要 Chart.js 庫</p>
-                <p class="text-muted">總營業額: <strong style="color: #10b981;">${{ "%.0f"|format(total_revenue) }}</strong></p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6 mb-4">
+<div class="row mb-4">
+    <div class="col-md-4">
         <div class="custom-card">
             <div class="card-body text-center">
                 <h3 style="color: #10b981;">${{ "%.0f"|format(total_revenue) }}</h3>
@@ -26,25 +14,135 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6 mb-4">
+    <div class="col-md-4">
         <div class="custom-card">
             <div class="card-body text-center">
-                <h3 style="color: #667eea;">30</h3>
-                <p class="text-muted mb-0">天數據</p>
+                <h3 style="color: #667eea;">{{ member_count }}</h3>
+                <p class="text-muted mb-0">會員總數</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="custom-card">
+            <div class="card-body text-center">
+                <h3 style="color: #f59e0b;">{{ customer_count }}</h3>
+                <p class="text-muted mb-0">顧客總數</p>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    .bi-graph-up {
-        animation: pulse 2s infinite;
-    }
+<div class="custom-card mb-4">
+    <div class="card-body">
+        <h5 class="card-title mb-4">📊 每月營業額</h5>
+        <div style="height: 300px;">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="custom-card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">👥 會員 vs 顧客</h5>
+                <div style="height: 250px;">
+                    <canvas id="memberChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="custom-card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">📅 本月預訂</h5>
+                <div style="height: 250px;">
+                    <canvas id="reservationChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'bar',
+        data: {
+            labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+            datasets: [{
+                label: '營業額',
+                data: [12000, 19000, 15000, 25000, 22000, 30000],
+                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
     
-    @keyframes pulse {
-        0% { opacity: 0.6; }
-        50% { opacity: 1; }
-        100% { opacity: 0.6; }
+    // Member vs Customer Chart
+    const memberCtx = document.getElementById('memberChart').getContext('2d');
+    new Chart(memberCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['會員', '顧客'],
+            datasets: [{
+                data: [{{ member_count }}, {{ customer_count }}],
+                backgroundColor: ['#10b981', '#f59e0b']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+    
+    // Reservation Chart
+    const resCtx = document.getElementById('reservationChart').getContext('2d');
+    new Chart(resCtx, {
+        type: 'line',
+        data: {
+            labels: ['第1周', '第2周', '第3周', '第4周'],
+            datasets: [{
+                label: '預訂數',
+                data: [12, 19, 15, 22],
+                borderColor: '#8b5cf6',
+                backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+<style>
+    .card-title {
+        font-weight: 600;
     }
 </style>
 {% endblock %}

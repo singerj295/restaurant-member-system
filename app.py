@@ -1243,13 +1243,18 @@ def revenue_chart():
     start_date = today - timedelta(days=30)
     
     # 呢度簡化處理 - 用顧客既總消費
-    # 實際應該用transactions表
     total_revenue = db.query(
         sql_func.sum(Customer.total_spent)
     ).scalar() or 0
+    
+    # 會員同顧客數量
+    member_count = db.query(Member).count()
+    customer_count = db.query(Customer).count()
     
     db.close()
     
     return render_template('revenue_chart.html', 
                          total_revenue=total_revenue,
+                         member_count=member_count,
+                         customer_count=customer_count,
                          restaurant_name=session.get('restaurant_name', '餐廳'))
