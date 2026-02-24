@@ -3,75 +3,318 @@
 {% block title %}分析 - {{ restaurant_name }}{% endblock %}
 
 {% block content %}
-    <div class="cp-header">
-        <h1 class="cp-title">📊 分析儀表板</h1>
-    </div>
-    
-    <!-- Stats -->
-    <div class="cp-stats">
-        <div class="cp-stat">
-            <div class="cp-stat-value">{{ total_customers }}</div>
-            <div class="cp-stat-label">顧客總數</div>
-        </div>
-        <div class="cp-stat">
-            <div class="cp-stat-value">{{ total_visits }}</div>
-            <div class="cp-stat-label">總訪問次數</div>
-        </div>
-        <div class="cp-stat">
-            <div class="cp-stat-value">${{ "%.0f"|format(total_revenue) }}</div>
-            <div class="cp-stat-label">顧客總消費</div>
-        </div>
-        <div class="cp-stat">
-            <div class="cp-stat-value">${{ "%.0f"|format(avg_spend) }}</div>
-            <div class="cp-stat-label">平均消費</div>
-        </div>
-    </div>
-    
-    <div class="cp-stats">
-        <div class="cp-stat">
-            <div class="cp-stat-value">{{ total_members }}</div>
-            <div class="cp-stat-label">會員總數</div>
-        </div>
-        <div class="cp-stat">
-            <div class="cp-stat-value">{{ active_members }}</div>
-            <div class="cp-stat-label">有效會員</div>
-        </div>
-        <div class="cp-stat">
-            <div class="cp-stat-value">{{ today_reservations }}</div>
-            <div class="cp-stat-label">今日預訂</div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-md-6">
-            <div class="cp-card">
-                <h3 class="cp-card-title">💰 消費最高顧客</h3>
-                <table class="cp-table">
-                    <thead><tr><th>姓名</th><th>電話</th><th>總消費</th></tr></thead>
-                    <tbody>
-                        {% for customer in top_customers %}
-                        <tr><td>{{ customer.name }}</td><td>{{ customer.phone }}</td><td>${{ "%.0f"|format(customer.total_spent) }}</td></tr>
-                        {% else %}
-                        <tr><td colspan="3" style="text-align: center;">無數據</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+<h1 class="page-title">📊 分析</h1>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-icon" style="background: linear-gradient(135deg, #ec4899, #be185d);">
+                <i class="bi bi-people"></i>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="cp-card">
-                <h3 class="cp-card-title">📅 即將預訂</h3>
-                <table class="cp-table">
-                    <thead><tr><th>日期</th><th>姓名</th><th>人數</th><th>狀態</th></tr></thead>
-                    <tbody>
-                        {% for res in upcoming_reservations %}
-                        <tr><td>{{ res.date.strftime('%m-%d %H:%M') }}</td><td>{{ res.name }}</td><td>{{ res.party_size }}</td><td><span class="cp-badge {% if res.status=='confirmed' %}cp-badge-primary{% else %}cp-badge-success{% endif %}">{{ '確認' if res.status=='confirmed' else '已入座' }}</span></td></tr>
-                        {% else %}
-                        <tr><td colspan="4" style="text-align: center;">無預訂</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="stats-info">
+                <span class="stats-number">{{ total_customers }}</span>
+                <span class="stats-label">顧客總數</span>
             </div>
         </div>
     </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-icon" style="background: linear-gradient(135deg, #14b8a6, #0d9488);">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <div class="stats-info">
+                <span class="stats-number">{{ total_visits }}</span>
+                <span class="stats-label">總訪問次數</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-icon" style="background: linear-gradient(135deg, #10b981, #047857);">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="stats-info">
+                <span class="stats-number">${{ "%.0f"|format(total_revenue) }}</span>
+                <span class="stats-label">顧客總消費</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <i class="bi bi-bar-chart"></i>
+            </div>
+            <div class="stats-info">
+                <span class="stats-number">${{ "%.0f"|format(avg_spend) }}</span>
+                <span class="stats-label">平均消費</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stats-card">
+            <div class="stats-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                <i class="bi bi-person-badge"></i>
+            </div>
+            <div class="stats-info">
+                <span class="stats-number">{{ total_members }}</span>
+                <span class="stats-label">會員總數</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card">
+            <div class="stats-icon" style="background: linear-gradient(135deg, #22c55e, #15803d);">
+                <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="stats-info">
+                <span class="stats-number">{{ active_members }}</span>
+                <span class="stats-label">有效會員</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card">
+            <div class="stats-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">
+                <i class="bi bi-calendar-check"></i>
+            </div>
+            <div class="stats-info">
+                <span class="stats-number">{{ today_reservations }}</span>
+                <span class="stats-label">今日預訂</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="custom-card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-trophy me-2"></i>消費最高顧客</h5>
+                {% if top_customers %}
+                <div class="top-list">
+                    {% for customer in top_customers %}
+                    <div class="top-item">
+                        <div class="top-rank">#{{ loop.index }}</div>
+                        <div class="top-avatar" style="background: linear-gradient(135deg, #ec4899, #be185d);">
+                            {{ customer.name[0] }}
+                        </div>
+                        <div class="top-info">
+                            <span class="top-name">{{ customer.name }}</span>
+                            <span class="top-phone">{{ customer.phone }}</span>
+                        </div>
+                        <div class="top-amount">${{ "%.0f"|format(customer.total_spent) }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-4">暫無數據</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="custom-card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-calendar-event me-2"></i>即將預訂</h5>
+                {% if upcoming_reservations %}
+                <div class="reservation-list">
+                    {% for res in upcoming_reservations %}
+                    <div class="reservation-item">
+                        <div class="reservation-date">
+                            <span class="date">{{ res.date.strftime('%m/%d') }}</span>
+                            <span class="time">{{ res.date.strftime('%H:%M') }}</span>
+                        </div>
+                        <div class="reservation-info">
+                            <span class="reservation-name">{{ res.name }}</span>
+                            <span class="reservation-phone">{{ res.phone }}</span>
+                        </div>
+                        <div class="reservation-meta">
+                            <span class="badge bg-secondary">{{ res.party_size }}位</span>
+                            {% if res.status == 'confirmed' %}
+                            <span class="badge bg-success">確認</span>
+                            {% else %}
+                            <span class="badge bg-warning">已入座</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-4">暫無預訂</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stats-card {
+        background: var(--card-bg, white);
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .stats-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+    
+    .stats-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .stats-number {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-color, #1f2937);
+    }
+    
+    .stats-label {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+    
+    .card-title {
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .top-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .top-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: var(--border-color);
+        border-radius: 12px;
+        transition: transform 0.2s;
+    }
+    
+    .top-item:hover {
+        transform: translateX(4px);
+    }
+    
+    .top-rank {
+        font-weight: 700;
+        color: #f59e0b;
+        font-size: 1.1rem;
+        min-width: 30px;
+    }
+    
+    .top-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .top-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .top-name {
+        font-weight: 500;
+    }
+    
+    .top-phone {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+    
+    .top-amount {
+        font-weight: 700;
+        color: #10b981;
+        font-size: 1.1rem;
+    }
+    
+    .reservation-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .reservation-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: var(--border-color);
+        border-radius: 12px;
+    }
+    
+    .reservation-date {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 50px;
+    }
+    
+    .reservation-date .date {
+        font-weight: 600;
+        color: #3b82f6;
+    }
+    
+    .reservation-date .time {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+    
+    .reservation-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .reservation-name {
+        font-weight: 500;
+    }
+    
+    .reservation-phone {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+    
+    .reservation-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-end;
+    }
+</style>
 {% endblock %}
