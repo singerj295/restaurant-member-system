@@ -920,6 +920,37 @@ def update_reservation(res_id):
     db.close()
     return redirect(url_for('reservations'))
 
+@app.route('/reservations/<int:res_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_reservation(res_id):
+    db = get_db_session()
+    reservation = db.query(Reservation).get(res_id)
+    
+    if not reservation:
+        db.close()
+        flash('預訂不存在', 'error')
+        return redirect(url_for('reservations'))
+    
+    if request.method == 'POST':
+        reservation.name = request.form.get('name')
+        reservation.phone = request.form.get('phone')
+        reservation.email = request.form.get('email', '')
+        date_str = request.form.get('date')
+        time_str = request.form.get('time')
+        if date_str and time_str:
+            reservation.date = datetime.strptime(f'{date_str} {time_str}', '%Y-%m-%d %H:%M')
+        reservation.party_size = int(request.form.get('party_size', 1))
+        reservation.table_number = request.form.get('table_number', '')
+        reservation.status = request.form.get('status')
+        reservation.note = request.form.get('note', '')
+        db.commit()
+        flash('預訂已更新', 'success')
+        db.close()
+        return redirect(url_for('reservations'))
+    
+    db.close()
+    return render_template('edit_reservation.html', reservation=reservation, restaurant_name=session.get('restaurant_name', '餐廳'))
+
 @app.route('/reservations/<int:res_id>/delete', methods=['POST'])
 @login_required
 def delete_reservation(res_id):

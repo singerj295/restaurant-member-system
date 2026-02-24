@@ -54,21 +54,65 @@
                     <td><span class="party-size">{{ res.party_size }}位</span></td>
                     <td>{{ res.table_number or '-' }}</td>
                     <td>
-                        {% if res.status == 'booked' %}
-                        <span class="status-badge booked"><i class="bi bi-bookmark me-1"></i>已預約</span>
-                        {% elif res.status == 'confirmed' %}
-                        <span class="status-badge confirmed"><i class="bi bi-check-circle me-1"></i>確認訂座</span>
-                        {% elif res.status == 'seated' %}
-                        <span class="status-badge seated"><i class="bi bi-people me-1"></i>已入座</span>
-                        {% elif res.status == 'completed' %}
-                        <span class="status-badge completed"><i class="bi bi-check2-all me-1"></i>完成</span>
-                        {% elif res.status == 'no_show' %}
-                        <span class="status-badge no-show"><i class="bi bi-x-circle me-1"></i>No-Show</span>
-                        {% elif res.status == 'cancelled' %}
-                        <span class="status-badge cancelled"><i class="bi bi-x-lg me-1"></i>已取消</span>
-                        {% else %}
-                        <span class="status-badge">{{ res.status }}</span>
-                        {% endif %}
+                        <div class="status-cell">
+                            {% if res.status == 'booked' %}
+                            <span class="status-badge booked"><i class="bi bi-bookmark me-1"></i>已預約</span>
+                            {% elif res.status == 'confirmed' %}
+                            <span class="status-badge confirmed"><i class="bi bi-check-circle me-1"></i>確認訂座</span>
+                            {% elif res.status == 'seated' %}
+                            <span class="status-badge seated"><i class="bi bi-people me-1"></i>已入座</span>
+                            {% elif res.status == 'completed' %}
+                            <span class="status-badge completed"><i class="bi bi-check2-all me-1"></i>完成</span>
+                            {% elif res.status == 'no_show' %}
+                            <span class="status-badge no-show"><i class="bi bi-x-circle me-1"></i>No-Show</span>
+                            {% elif res.status == 'cancelled' %}
+                            <span class="status-badge cancelled"><i class="bi bi-x-lg me-1"></i>已取消</span>
+                            {% else %}
+                            <span class="status-badge">{{ res.status }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="quick-actions">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{{ url_for('edit_reservation', res_id=res.id) }}">✏️ 編輯資料</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><span class="dropdown-item-text text-muted">快速改狀態：</span></li>
+                                    <li><form method="POST" action="{{ url_for('update_reservation', res_id=res.id) }}" style="display:inline;">
+                                        <input type="hidden" name="status" value="booked">
+                                        <input type="hidden" name="table_number" value="{{ res.table_number or '' }}">
+                                        <button type="submit" class="dropdown-item">📋 已預約</button>
+                                    </form></li>
+                                    <li><form method="POST" action="{{ url_for('update_reservation', res_id=res.id) }}" style="display:inline;">
+                                        <input type="hidden" name="status" value="confirmed">
+                                        <input type="hidden" name="table_number" value="{{ res.table_number or '' }}">
+                                        <button type="submit" class="dropdown-item">✅ 確認訂座</button>
+                                    </form></li>
+                                    <li><form method="POST" action="{{ url_for('update_reservation', res_id=res.id) }}" style="display:inline;">
+                                        <input type="hidden" name="status" value="seated">
+                                        <input type="hidden" name="table_number" value="{{ res.table_number or '' }}">
+                                        <button type="submit" class="dropdown-item">👥 已入座</button>
+                                    </form></li>
+                                    <li><form method="POST" action="{{ url_for('update_reservation', res_id=res.id) }}" style="display:inline;">
+                                        <input type="hidden" name="status" value="completed">
+                                        <input type="hidden" name="table_number" value="{{ res.table_number or '' }}">
+                                        <button type="submit" class="dropdown-item">✔ 完成</button>
+                                    </form></li>
+                                    <li><form method="POST" action="{{ url_for('update_reservation', res_id=res.id) }}" style="display:inline;">
+                                        <input type="hidden" name="status" value="no_show">
+                                        <input type="hidden" name="table_number" value="{{ res.table_number or '' }}">
+                                        <button type="submit" class="dropdown-item">❌ No-Show</button>
+                                    </form></li>
+                                    <li><form method="POST" action="{{ url_for('update_reservation', res_id=res.id) }}" style="display:inline;">
+                                        <input type="hidden" name="status" value="cancelled">
+                                        <input type="hidden" name="table_number" value="{{ res.table_number or '' }}">
+                                        <button type="submit" class="dropdown-item">🚫 已取消</button>
+                                    </form></li>
+                                </ul>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 {% else %}
@@ -163,6 +207,32 @@
         border-radius: 20px;
         font-size: 0.8rem;
         font-weight: 500;
+    }
+    
+    .status-cell {
+        display: inline-block;
+        margin-right: 8px;
+    }
+    
+    .quick-actions {
+        display: inline-block;
+        vertical-align: middle;
+    }
+    
+    .quick-actions .dropdown-toggle::after {
+        display: none;
+    }
+    
+    .quick-actions .dropdown-menu {
+        font-size: 0.85rem;
+    }
+    
+    .quick-actions .dropdown-item {
+        padding: 8px 16px;
+    }
+    
+    .quick-actions .dropdown-item:hover {
+        background: #f3f4f6;
     }
     
     .status-badge.booked {

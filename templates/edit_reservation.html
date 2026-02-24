@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}編輯預訂 - {{ restaurant_name }}{% endblock %}
+
+{% block content %}
+<h1 class="page-title">✏️ 編輯預訂</h1>
+
+<div class="custom-card" style="max-width: 600px;">
+    <div class="card-body">
+        <form method="POST">
+            <div class="form-group mb-3">
+                <label class="form-label">姓名 *</label>
+                <input type="text" name="name" class="form-control" value="{{ reservation.name }}" required>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label class="form-label">電話 *</label>
+                <input type="tel" name="phone" class="form-control" value="{{ reservation.phone }}" pattern="[0-9]{8,}" required>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label class="form-label">電郵</label>
+                <input type="email" name="email" class="form-control" value="{{ reservation.email or '' }}">
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="form-group">
+                        <label class="form-label">日期 *</label>
+                        <input type="date" name="date" class="form-control" value="{{ reservation.date.strftime('%Y-%m-%d') }}" required>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label class="form-label">時間 *</label>
+                        <input type="time" name="time" class="form-control" value="{{ reservation.date.strftime('%H:%M') }}" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="form-group">
+                        <label class="form-label">人數</label>
+                        <input type="number" name="party_size" class="form-control" value="{{ reservation.party_size }}" min="1">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label class="form-label">座位</label>
+                        <input type="text" name="table_number" class="form-control" value="{{ reservation.table_number or '' }}" placeholder="例如：A1, B2">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label class="form-label">狀態</label>
+                <select name="status" class="form-select">
+                    <option value="booked" {% if reservation.status == 'booked' %}selected{% endif %}>📋 已預約</option>
+                    <option value="confirmed" {% if reservation.status == 'confirmed' %}selected{% endif %}>✅ 確認訂座</option>
+                    <option value="seated" {% if reservation.status == 'seated' %}selected{% endif %}>👥 已入座</option>
+                    <option value="completed" {% if reservation.status == 'completed' %}selected{% endif %}>✔ 完成</option>
+                    <option value="no_show" {% if reservation.status == 'no_show' %}selected{% endif %}>❌ No-Show</option>
+                    <option value="cancelled" {% if reservation.status == 'cancelled' %}selected{% endif %}>🚫 已取消</option>
+                </select>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label class="form-label">備註</label>
+                <textarea name="note" class="form-control" rows="3">{{ reservation.note or '' }}</textarea>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg me-1"></i>儲存
+                </button>
+                <a href="{{ url_for('reservations') }}" class="btn btn-outline-secondary">取消</a>
+                <form method="POST" action="{{ url_for('delete_reservation', res_id=reservation.id) }}" style="display:inline; margin-left: auto;" onsubmit="return confirm('確定要刪除呢個預訂嗎？');">
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-trash me-1"></i>刪除
+                    </button>
+                </form>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 16px;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: var(--text-color);
+    }
+    
+    .form-control, .form-select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 1rem;
+        background: var(--card-bg);
+        color: var(--text-color);
+        transition: all 0.2s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+</style>
+{% endblock %}
