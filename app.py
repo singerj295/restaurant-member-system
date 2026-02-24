@@ -3,6 +3,10 @@ from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime, timedelta
+import pytz
+hk_tz = pytz.timezone('Asia/Hong_Kong')
+def now_hk():
+    return datetime.now(hk_tz)
 from functools import wraps
 import os
 
@@ -261,8 +265,11 @@ def dashboard():
     restaurant_name = settings_obj.restaurant_name if settings_obj else '我的餐廳'
     dark_mode = settings_obj.dark_mode if settings_obj else 0
     
-    # 今日預訂
-    today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    # 今日預訂 (香港時區 UTC+8)
+    import pytz
+    hk_tz = pytz.timezone('Asia/Hong_Kong')
+    now_hk = datetime.now(hk_tz)
+    today = now_hk.replace(hour=0, minute=0, second=0, microsecond=0)
     tomorrow = today + timedelta(days=1)
     today_reservations = db.query(Reservation).filter(
         Reservation.date >= today,
