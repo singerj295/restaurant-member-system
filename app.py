@@ -284,9 +284,16 @@ def dashboard():
 @login_required
 def members():
     db = get_db_session()
-    members_list = db.query(Member).all()
+    search = request.args.get('search', '').strip()
+    if search:
+        members_list = db.query(Member).filter(
+            (Member.name.like(f'%{search}%')) | 
+            (Member.phone.like(f'%{search}%'))
+        ).all()
+    else:
+        members_list = db.query(Member).all()
     db.close()
-    return render_template('members.html', members=members_list)
+    return render_template('members.html', members=members_list, search=search)
 
 @app.route('/members/add', methods=['GET', 'POST'])
 @login_required
@@ -578,9 +585,16 @@ def checkout():
 @login_required
 def customers():
     db = get_db_session()
-    customers_list = db.query(Customer).all()
+    search = request.args.get('search', '').strip()
+    if search:
+        customers_list = db.query(Customer).filter(
+            (Customer.name.like(f'%{search}%')) | 
+            (Customer.phone.like(f'%{search}%'))
+        ).all()
+    else:
+        customers_list = db.query(Customer).all()
     db.close()
-    return render_template('customers.html', customers=customers_list)
+    return render_template('customers.html', customers=customers_list, search=search)
 
 @app.route('/customers/add', methods=['GET', 'POST'])
 @login_required
@@ -782,21 +796,30 @@ def add_interaction(customer_id):
 def reservations():
     db = get_db_session()
     date_filter = request.args.get('date')
+    search = request.args.get('search', '').strip()
+    
+    query = db.query(Reservation)
+    
+    if search:
+        query = query.filter(
+            (Reservation.name.like(f'%{search}%')) | 
+            (Reservation.phone.like(f'%{search}%'))
+        )
     
     if date_filter:
         try:
             filter_date = datetime.strptime(date_filter, '%Y-%m-%d')
-            reservations_list = db.query(Reservation).filter(
+            query = query.filter(
                 Reservation.date >= filter_date,
                 Reservation.date < filter_date + timedelta(days=1)
-            ).order_by(Reservation.date).all()
+            )
         except:
-            reservations_list = db.query(Reservation).order_by(Reservation.date.desc()).all()
-    else:
-        reservations_list = db.query(Reservation).order_by(Reservation.date.desc()).limit(50).all()
+            pass
+    
+    reservations_list = query.order_by(Reservation.date.desc()).limit(50).all()
     
     db.close()
-    return render_template('reservations.html', reservations=reservations_list)
+    return render_template('reservations.html', reservations=reservations_list, search=search)
 
 @app.route('/reservations/add', methods=['GET', 'POST'])
 @login_required
