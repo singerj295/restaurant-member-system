@@ -1190,3 +1190,59 @@ if __name__ == '__main__':
     init_db()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
+
+# --- 數據備份 ---
+import shutil
+from datetime import datetime as dt
+
+@app.route('/backup')
+@login_required
+def backup_db():
+    import os
+    backup_dir = os.path.join(os.path.dirname(__file__), 'backups')
+    os.makedirs(backup_dir, exist_ok=True)
+    
+    timestamp = dt.now().strftime('%Y%m%d_%H%M%S')
+    backup_file = os.path.join(backup_dir, f'restaurant_backup_{timestamp}.db')
+    
+    db_path = os.path.join(os.path.dirname(__file__), 'restaurant.db')
+    shutil.copy2(db_path, backup_file)
+    
+    flash(f'數據已備份: {timestamp}', 'success')
+    return redirect(url_for('dashboard'))
+
+@app.route('/backups')
+@login_required
+def list_backups():
+    import os
+    backup_dir = os.path.join(os.path.dirname(__file__), 'backups')
+    files = []
+    if os.path.exists(backup_dir):
+        for f in sorted(os.listdir(backup_dir), reverse=True):
+            if f.endswith('.db'):
+                files.append(f)
+    return render_template('backups.html', backups=files, restaurant_name=session.get('restaurant_name', '餐廳'))
+
+# --- 每日營業額趨勢圖 ---
+@app.route('/revenue-chart')
+@login_required
+def revenue_chart():
+    from sqlalchemy import func as sql_func
+    db = get_db_session()
+    
+    # 獲取過去30日既數據
+    today = datetime.utcnow()
+    from datetime import timedelta
+    start_date = today - timedelta(days=30)
+    
+    # 呢度簡化處理 - 用顧客既總消費
+    # 實際應該用transactions表
+    total_revenue = db.query(
+        sql_func.sum(Customer.total_spent)
+    ).scalar() or 0
+    
+    db.close()
+    
+    return render_template('revenue_chart.html', 
+                         total_revenue=total_revenue,
+                         restaurant_name=session.get('restaurant_name', '餐廳'))

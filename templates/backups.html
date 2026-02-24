@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}數據備份 - {{ restaurant_name }}{% endblock %}
+
+{% block content %}
+<h1 class="page-title">💾 數據備份</h1>
+
+<div class="custom-card mb-4">
+    <div class="card-body">
+        <a href="{{ url_for('backup_db') }}" class="btn btn-primary">
+            <i class="bi bi-download me-2"></i>建立新備份
+        </a>
+    </div>
+</div>
+
+<div class="custom-card">
+    <div class="card-body">
+        <h5 class="card-title mb-4">備份記錄</h5>
+        {% if backups %}
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>備份日期</th>
+                    <th>檔案名</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for backup in backups %}
+                <tr>
+                    <td>{{ backup.replace('restaurant_backup_', '').replace('.db', '').replace('_', ' ') }}</td>
+                    <td>{{ backup }}</td>
+                    <td>
+                        <span class="text-muted">（請透過SSH存取）</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted text-center py-4">暫無備份記錄</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .card-title {
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
