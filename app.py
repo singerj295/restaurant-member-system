@@ -271,16 +271,17 @@ def dashboard():
     ).order_by(Reservation.date).all()
     
     # 今日營業額（從transactions表或顧客消費計算）
-    today_revenue = db.query(Customer).with_entities(
-        db.func.sum(Customer.total_spent)
+    from sqlalchemy import func as sql_func
+    today_revenue = db.query(
+        sql_func.sum(Customer.total_spent)
     ).scalar() or 0
     
     # 最近加入的會員
     recent_members = db.query(Member).order_by(Member.effective_date.desc()).limit(5).all()
     
     # 總會員儲值
-    total_balance = db.query(Member).with_entities(
-        db.func.sum(Member.balance)
+    total_balance = db.query(
+        sql_func.sum(Member.balance)
     ).scalar() or 0
     
     # 今日日期字符串
