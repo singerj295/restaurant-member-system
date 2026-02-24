@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}編輯顧客 - {{ restaurant_name }}{% endblock %}
+
+{% block content %}
+    <div class="cp-header">
+        <h1 class="cp-title">✏️ 編輯顧客</h1>
+    </div>
+    
+    <div class="cp-card" style="max-width: 600px;">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="cp-form-label">姓名 *</label>
+                <input type="text" name="name" class="cp-form-control" value="{{ customer.name }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">電話 *</label>
+                <input type="tel" name="phone" class="cp-form-control" value="{{ customer.phone }}" pattern="[0-9]{8,}" required>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">電郵</label>
+                <input type="email" name="email" class="cp-form-control" value="{{ customer.email or '' }}">
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">生日</label>
+                <input type="date" name="birthday" class="cp-form-control" value="{{ customer.birthday.strftime('%Y-%m-%d') if customer.birthday else '' }}">
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">標籤</label>
+                <input type="text" name="tags" class="cp-form-control" value="{{ customer.tags or '' }}">
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">過敏食物</label>
+                <textarea name="allergies" class="cp-form-control" rows="2">{{ customer.allergies or '' }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">喜好備註</label>
+                <textarea name="preferences" class="cp-form-control" rows="2">{{ customer.preferences or '' }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">總消費</label>
+                <input type="text" class="cp-form-control" value="${{ customer.total_spent }}" readonly>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button type="submit" class="cp-btn cp-btn-primary">儲存</button>
+                <a href="{{ url_for('customers') }}" class="cp-btn cp-btn-secondary">取消</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

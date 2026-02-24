@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}添加互動 - {{ restaurant_name }}{% endblock %}
+
+{% block content %}
+    <div class="cp-header">
+        <h1 class="cp-title">➕ 添加互動 - {{ customer.name }}</h1>
+    </div>
+    
+    <div class="cp-card" style="max-width: 600px;">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="cp-form-label">類型 *</label>
+                <select name="type" class="cp-form-control" required>
+                    <option value="call">📞 電話</option>
+                    <option value="complaint">⚠️ 投訴</option>
+                    <option value="compliment">👍 讚賞</option>
+                    <option value="request">📝 要求</option>
+                    <option value="marketing">📣 推廣</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">內容</label>
+                <textarea name="note" class="cp-form-control" rows="4" required></textarea>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button type="submit" class="cp-btn cp-btn-primary">儲存</button>
+                <a href="{{ url_for('customer_interactions', customer_id=customer.id) }}" class="cp-btn cp-btn-secondary">取消</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

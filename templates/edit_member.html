@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}編輯會員 - {{ restaurant_name }}{% endblock %}
+
+{% block content %}
+    <div class="cp-header">
+        <h1 class="cp-title">✏️ 編輯會員</h1>
+    </div>
+    
+    <div class="cp-card" style="max-width: 600px;">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="cp-form-label">姓名 *</label>
+                <input type="text" name="name" class="cp-form-control" value="{{ member.name }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">電話 *</label>
+                <input type="tel" name="phone" class="cp-form-control" value="{{ member.phone }}" pattern="[0-9]{8,}" required>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">會員等級</label>
+                <select name="tier" class="cp-form-control">
+                    <option value="普通會員" {% if member.tier == '普通會員' %}selected{% endif %}>普通會員</option>
+                    <option value="黑鑽會員" {% if member.tier == '黑鑽會員' %}selected{% endif %}>黑鑽會員 💎</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">儲值餘額 ($)</label>
+                <input type="number" name="balance" class="cp-form-control" value="{{ member.balance }}" step="0.01" min="0">
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">生效日期</label>
+                <input type="date" name="effective_date" class="cp-form-control" value="{{ member.effective_date.strftime('%Y-%m-%d') if member.effective_date else '' }}">
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">到期日期</label>
+                <input type="date" name="expiry_date" class="cp-form-control" value="{{ member.expiry_date.strftime('%Y-%m-%d') if member.expiry_date else '' }}">
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button type="submit" class="cp-btn cp-btn-primary">儲存</button>
+                <a href="{{ url_for('members') }}" class="cp-btn cp-btn-secondary">取消</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

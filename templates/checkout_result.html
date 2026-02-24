@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}結帳完成 - {{ restaurant_name }}{% endblock %}
+
+{% block content %}
+    <div class="cp-header">
+        <h1 class="cp-title">✅ 結帳完成</h1>
+    </div>
+    
+    <div class="cp-card" style="max-width: 500px; text-align: center;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
+        <h2 class="mb-4">結帳完成</h2>
+        
+        <div class="cp-alert cp-alert-success" style="text-align: left;">
+            <strong>會員：</strong> {{ member_name }} ({{ member_tier }})<br><br>
+            <strong>原始金額：</strong> ${{ "%.2f"|format(original_amount) }}<br>
+            {% if discount_amount > 0 %}
+            <strong>折扣 (20%)：</strong> -${{ "%.2f"|format(discount_amount) }}<br>
+            {% endif %}
+            <hr>
+            <strong>最終金額：</strong> ${{ "%.2f"|format(final_amount) }}<br>
+            {% if paid_from_balance > 0 %}
+            <strong>儲值扣款：</strong> -${{ "%.2f"|format(paid_from_balance) }}<br>
+            {% endif %}
+            <strong>現金支付：</strong> ${{ "%.2f"|format(cash_paid) }}
+        </div>
+        
+        {% if remaining_balance > 0 %}
+        <div class="cp-alert cp-alert-success">
+            會員剩餘儲值: <strong>${{ "%.2f"|format(remaining_balance) }}</strong>
+        </div>
+        {% endif %}
+        
+        <div style="display: flex; gap: 0.75rem; justify-content: center; margin-top: 1.5rem;">
+            <a href="{{ url_for('checkout') }}" class="cp-btn cp-btn-primary">繼續結帳</a>
+            <a href="{{ url_for('dashboard') }}" class="cp-btn cp-btn-secondary">返回控制台</a>
+        </div>
+    </div>
+{% endblock %}

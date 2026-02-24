@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}升級為會員 - {{ restaurant_name }}{% endblock %}
+
+{% block content %}
+    <div class="cp-header">
+        <h1 class="cp-title">⬆️ 升級為會員</h1>
+    </div>
+    
+    <div class="cp-card" style="max-width: 500px;">
+        <div class="cp-alert cp-alert-success mb-4">
+            <strong>顧客資料：</strong><br>
+            姓名: {{ customer.name }}<br>
+            電話: {{ customer.phone }}<br>
+            {% if customer.email %}電郵: {{ customer.email }}{% endif %}
+        </div>
+        
+        <form method="POST">
+            <div class="mb-4">
+                <label class="cp-form-label">會員等級 *</label>
+                <select name="tier" class="cp-form-control" required>
+                    <option value="普通會員">普通會員 - 每週甜品+咖啡</option>
+                    <option value="黑鑽會員">黑鑽會員 💎 - 20%折扣 + 廚師發辦</option>
+                </select>
+            </div>
+            
+            <div class="cp-alert cp-alert-success mb-4">
+                升級後會建立新會員，會員有效期為1年
+            </div>
+            
+            <div style="display: flex; gap: 0.75rem;">
+                <button type="submit" class="cp-btn cp-btn-primary">確認升級</button>
+                <a href="{{ url_for('customers') }}" class="cp-btn cp-btn-secondary">取消</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

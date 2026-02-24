@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}分析 - {{ restaurant_name }}{% endblock %}
+
+{% block content %}
+    <div class="cp-header">
+        <h1 class="cp-title">📊 分析儀表板</h1>
+    </div>
+    
+    <!-- Stats -->
+    <div class="cp-stats">
+        <div class="cp-stat">
+            <div class="cp-stat-value">{{ total_customers }}</div>
+            <div class="cp-stat-label">顧客總數</div>
+        </div>
+        <div class="cp-stat">
+            <div class="cp-stat-value">{{ total_visits }}</div>
+            <div class="cp-stat-label">總訪問次數</div>
+        </div>
+        <div class="cp-stat">
+            <div class="cp-stat-value">${{ "%.0f"|format(total_revenue) }}</div>
+            <div class="cp-stat-label">顧客總消費</div>
+        </div>
+        <div class="cp-stat">
+            <div class="cp-stat-value">${{ "%.0f"|format(avg_spend) }}</div>
+            <div class="cp-stat-label">平均消費</div>
+        </div>
+    </div>
+    
+    <div class="cp-stats">
+        <div class="cp-stat">
+            <div class="cp-stat-value">{{ total_members }}</div>
+            <div class="cp-stat-label">會員總數</div>
+        </div>
+        <div class="cp-stat">
+            <div class="cp-stat-value">{{ active_members }}</div>
+            <div class="cp-stat-label">有效會員</div>
+        </div>
+        <div class="cp-stat">
+            <div class="cp-stat-value">{{ today_reservations }}</div>
+            <div class="cp-stat-label">今日預訂</div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="cp-card">
+                <h3 class="cp-card-title">💰 消費最高顧客</h3>
+                <table class="cp-table">
+                    <thead><tr><th>姓名</th><th>電話</th><th>總消費</th></tr></thead>
+                    <tbody>
+                        {% for customer in top_customers %}
+                        <tr><td>{{ customer.name }}</td><td>{{ customer.phone }}</td><td>${{ "%.0f"|format(customer.total_spent) }}</td></tr>
+                        {% else %}
+                        <tr><td colspan="3" style="text-align: center;">無數據</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="cp-card">
+                <h3 class="cp-card-title">📅 即將預訂</h3>
+                <table class="cp-table">
+                    <thead><tr><th>日期</th><th>姓名</th><th>人數</th><th>狀態</th></tr></thead>
+                    <tbody>
+                        {% for res in upcoming_reservations %}
+                        <tr><td>{{ res.date.strftime('%m-%d %H:%M') }}</td><td>{{ res.name }}</td><td>{{ res.party_size }}</td><td><span class="cp-badge {% if res.status=='confirmed' %}cp-badge-primary{% else %}cp-badge-success{% endif %}">{{ '確認' if res.status=='confirmed' else '已入座' }}</span></td></tr>
+                        {% else %}
+                        <tr><td colspan="4" style="text-align: center;">無預訂</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

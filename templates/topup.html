@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}儲值 - {{ restaurant_name }}{% endblock %}
+
+{% block content %}
+    <div class="cp-header">
+        <h1 class="cp-title">💰 儲值 - {{ member.name }}</h1>
+    </div>
+    
+    <div class="cp-card" style="max-width: 500px;">
+        <div class="cp-alert cp-alert-success mb-4">
+            <strong>會員：</strong> {{ member.name }}<br>
+            <strong>等級：</strong> {{ member.tier }}<br>
+            <strong>目前餘額：</strong> ${{ "%.2f"|format(member.balance) }}
+        </div>
+        
+        <form method="POST">
+            <div class="mb-3">
+                <label class="cp-form-label">儲值金額 ($)</label>
+                <input type="number" name="amount" class="cp-form-control" step="0.01" min="0.01" required autofocus>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button type="submit" class="cp-btn cp-btn-primary">確認儲值</button>
+                <a href="{{ url_for('members') }}" class="cp-btn cp-btn-secondary">取消</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

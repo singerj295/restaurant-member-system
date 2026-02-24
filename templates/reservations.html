@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}預訂管理{% endblock %}
+
+{% block content %}
+<h1 class="page-title">預訂管理</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div></div>
+    <a href="{{ url_for('add_reservation') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>新增預訂
+    </a>
+</div>
+
+<div class="custom-card">
+    <div class="card-body p-0">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>日期時間</th>
+                    <th>姓名</th>
+                    <th>電話</th>
+                    <th>人數</th>
+                    <th>座位</th>
+                    <th>狀態</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in reservations %}
+                <tr>
+                    <td style="font-weight: 500;">{{ res.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ res.name }}</td>
+                    <td>{{ res.phone }}</td>
+                    <td>{{ res.party_size }}</td>
+                    <td>{{ res.table_number or '-' }}</td>
+                    <td>
+                        {% if res.status == 'confirmed' %}
+                        <span class="badge bg-primary">確認</span>
+                        {% elif res.status == 'seated' %}
+                        <span class="badge bg-success">已入座</span>
+                        {% elif res.status == 'no_show' %}
+                        <span class="badge bg-danger">No-Show</span>
+                        {% else %}
+                        <span class="badge bg-secondary">{{ res.status }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-5">暫無預訂</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

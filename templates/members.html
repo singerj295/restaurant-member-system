@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}會員管理{% endblock %}
+
+{% block content %}
+<h1 class="page-title">會員管理</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div></div>
+    <a href="{{ url_for('add_member') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>新增會員
+    </a>
+</div>
+
+<div class="custom-card">
+    <div class="card-body p-0">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>姓名</th>
+                    <th>電話</th>
+                    <th>等級</th>
+                    <th>儲值</th>
+                    <th>狀態</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                <tr>
+                    <td>#{{ member.id }}</td>
+                    <td style="font-weight: 500;">{{ member.name }}</td>
+                    <td>{{ member.phone }}</td>
+                    <td>
+                        {% if member.tier == '黑鑽會員' %}
+                        <span class="badge bg-warning text-dark">💎 黑鑽</span>
+                        {% else %}
+                        <span class="badge bg-secondary">普通</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-weight: 600; color: #10b981;">${{ "%.0f"|format(member.balance) }}</td>
+                    <td>
+                        {% if member.is_active %}
+                        <span class="badge bg-success">有效</span>
+                        {% else %}
+                        <span class="badge bg-danger">過期</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('edit_member', member_id=member.id) }}" class="btn btn-sm btn-outline-primary">編輯</a>
+                        <a href="{{ url_for('topup_member', member_id=member.id) }}" class="btn btn-sm btn-outline-success">儲值</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-5">暫無會員</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

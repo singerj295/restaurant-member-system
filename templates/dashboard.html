@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}控制台 - 暴富火鍋{% endblock %}
+
+{% block content %}
+<h1 class="page-title">控制台</h1>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card blue">
+            <h3>{{ member_count }}</h3>
+            <p>會員總數</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card green">
+            <h3>{{ customer_count }}</h3>
+            <p>顧客總數</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card orange">
+            <h3>{{ today_reservations|length }}</h3>
+            <p>今日預訂</p>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="custom-card mb-4">
+    <div class="card-body">
+        <h5 style="font-weight: 600; margin-bottom: 16px;">快速功能</h5>
+        <a href="{{ url_for('checkout') }}" class="btn btn-primary me-2">
+            <i class="bi bi-cash-stack me-1"></i>結帳
+        </a>
+        <a href="{{ url_for('add_member') }}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-person-plus me-1"></i>新增會員
+        </a>
+        <a href="{{ url_for('add_customer') }}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-person-plus me-1"></i>新增顧客
+        </a>
+        <a href="{{ url_for('add_reservation') }}" class="btn btn-outline-primary">
+            <i class="bi bi-calendar-plus me-1"></i>新增預訂
+        </a>
+    </div>
+</div>
+
+<!-- Today's Reservations -->
+{% if today_reservations %}
+<div class="custom-card">
+    <div class="card-body">
+        <h5 style="font-weight: 600; margin-bottom: 16px;">今日預訂</h5>
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>時間</th>
+                    <th>姓名</th>
+                    <th>電話</th>
+                    <th>人數</th>
+                    <th>座位</th>
+                    <th>狀態</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in today_reservations %}
+                <tr>
+                    <td>{{ res.date.strftime('%H:%M') }}</td>
+                    <td style="font-weight: 500;">{{ res.name }}</td>
+                    <td>{{ res.phone }}</td>
+                    <td>{{ res.party_size }}</td>
+                    <td>{{ res.table_number or '-' }}</td>
+                    <td>
+                        {% if res.status == 'confirmed' %}
+                        <span class="badge bg-success">確認</span>
+                        {% else %}
+                        <span class="badge bg-warning">已入座</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

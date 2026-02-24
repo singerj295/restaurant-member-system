@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}新增會員 - {{ restaurant_name }}{% endblock %}
+
+{% block content %}
+    <div class="cp-header">
+        <h1 class="cp-title">➕ 新增會員</h1>
+    </div>
+    
+    <div class="cp-card" style="max-width: 600px;">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="cp-form-label">姓名 *</label>
+                <input type="text" name="name" class="cp-form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">電話 *</label>
+                <input type="tel" name="phone" class="cp-form-control" pattern="[0-9]{8,}" required>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">會員等級</label>
+                <select name="tier" class="cp-form-control" id="tierSelect" onchange="updateBenefitInfo()">
+                    <option value="普通會員">普通會員</option>
+                    <option value="黑鑽會員">黑鑽會員 💎</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">儲值金額 ($)</label>
+                <input type="number" name="balance" class="cp-form-control" value="0" step="0.01" min="0">
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">生效日期 *</label>
+                <input type="date" name="effective_date" class="cp-form-control" id="effectiveDate" required>
+            </div>
+            <div class="mb-3">
+                <div class="cp-alert cp-alert-success" id="benefitInfo">
+                    <strong>普通會員：</strong>每週免費甜品 + 咖啡
+                </div>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button type="submit" class="cp-btn cp-btn-primary">儲存</button>
+                <a href="{{ url_for('members') }}" class="cp-btn cp-btn-secondary">取消</a>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        document.getElementById('effectiveDate').valueAsDate = new Date();
+        function updateBenefitInfo() {
+            const tier = document.getElementById('tierSelect').value;
+            const info = document.getElementById('benefitInfo');
+            info.innerHTML = tier === '普通會員' ? '<strong>普通會員：</strong>每週免費甜品 + 咖啡' : '<strong>黑鑽會員：</strong>每年免費廚師發辦二人套餐 (2次/年)';
+        }
+    </script>
+{% endblock %}

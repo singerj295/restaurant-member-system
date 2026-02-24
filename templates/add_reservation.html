@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}新增預訂 - {{ restaurant_name }}{% endblock %}
+
+{% block content %}
+    <div class="cp-header">
+        <h1 class="cp-title">➕ 新增預訂</h1>
+    </div>
+    
+    <div class="cp-card" style="max-width: 600px;">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="cp-form-label">姓名 *</label>
+                <input type="text" name="name" class="cp-form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">電話 *</label>
+                <input type="tel" name="phone" class="cp-form-control" pattern="[0-9]{8,}" required>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">電郵</label>
+                <input type="email" name="email" class="cp-form-control">
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="cp-form-label">日期 *</label>
+                    <input type="date" name="date" class="cp-form-control" required>
+                </div>
+                <div class="col">
+                    <label class="cp-form-label">時間 *</label>
+                    <input type="time" name="time" class="cp-form-control" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">人數</label>
+                <input type="number" name="party_size" class="cp-form-control" value="1" min="1">
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">座位</label>
+                <input type="text" name="table_number" class="cp-form-control">
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">備註</label>
+                <textarea name="note" class="cp-form-control" rows="2"></textarea>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button type="submit" class="cp-btn cp-btn-primary">確認</button>
+                <a href="{{ url_for('reservations') }}" class="cp-btn cp-btn-secondary">取消</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

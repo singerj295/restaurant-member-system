@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}互動記錄 - {{ customer.name }}{% endblock %}
+
+{% block content %}
+    <div class="cp-header">
+        <h1 class="cp-title">📞 互動記錄 - {{ customer.name }}</h1>
+    </div>
+    
+    <div class="cp-card mb-4">
+        <strong>顧客：</strong> {{ customer.name }} | <strong>電話：</strong> {{ customer.phone }}
+    </div>
+    
+    <div class="cp-card">
+        <div class="cp-card-header">
+            <h3 class="cp-card-title">互動記錄</h3>
+            <a href="{{ url_for('add_interaction', customer_id=customer.id) }}" class="cp-btn cp-btn-primary">➕ 添加</a>
+        </div>
+        <table class="cp-table">
+            <thead>
+                <tr><th>日期</th><th>類型</th><th>內容</th></tr>
+            </thead>
+            <tbody>
+                {% for interaction in interactions %}
+                <tr>
+                    <td>{{ interaction.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        <span class="cp-badge {% if interaction.type == 'call' %}cp-badge-primary{% elif interaction.type == 'complaint' %}cp-badge-danger{% elif interaction.type == 'compliment' %}cp-badge-success{% else %}cp-badge-warning{% endif %}">
+                            {{ {'call': '📞電話', 'complaint': '⚠️投訴', 'compliment': '👍讚賞', 'request': '📝要求', 'marketing': '📣推廣'}.get(interaction.type, interaction.type) }}
+                        </span>
+                    </td>
+                    <td>{{ interaction.note or '-' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3" style="text-align: center;">暫無記錄</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

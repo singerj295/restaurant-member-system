@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}訪問記錄 - {{ customer.name }}{% endblock %}
+
+{% block content %}
+    <div class="cp-header">
+        <h1 class="cp-title">📝 訪問記錄 - {{ customer.name }}</h1>
+    </div>
+    
+    <div class="cp-card mb-4">
+        <strong>顧客：</strong> {{ customer.name }} | 
+        <strong>電話：</strong> {{ customer.phone }} | 
+        <strong>總消費：</strong> ${{ "%.2f"|format(customer.total_spent) }} | 
+        <strong>訪問次數：</strong> {{ customer.visits }}
+    </div>
+    
+    <div class="cp-card">
+        <div class="cp-card-header">
+            <h3 class="cp-card-title">訪問記錄</h3>
+            <a href="{{ url_for('add_visit_record', customer_id=customer.id) }}" class="cp-btn cp-btn-primary">➕ 添加</a>
+        </div>
+        <table class="cp-table">
+            <thead>
+                <tr><th>日期</th><th>金額</th><th>人數</th><th>座位</th><th>服務員</th><th>備註</th></tr>
+            </thead>
+            <tbody>
+                {% for visit in visits %}
+                <tr>
+                    <td>{{ visit.visit_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>${{ "%.2f"|format(visit.amount) }}</td>
+                    <td>{{ visit.party_size }}</td>
+                    <td>{{ visit.table_number or '-' }}</td>
+                    <td>{{ visit.server or '-' }}</td>
+                    <td>{{ visit.note or '-' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" style="text-align: center;">暫無記錄</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

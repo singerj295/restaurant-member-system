@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}註冊員工 - {{ restaurant_name }}{% endblock %}
+
+{% block content %}
+    <div class="cp-header">
+        <h1 class="cp-title">➕ 註冊員工</h1>
+    </div>
+    
+    <div class="cp-card" style="max-width: 500px;">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="cp-form-label">用戶名 *</label>
+                <input type="text" name="username" class="cp-form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">密碼 *</label>
+                <input type="password" name="password" class="cp-form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="cp-form-label">姓名</label>
+                <input type="text" name="name" class="cp-form-control">
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                <button type="submit" class="cp-btn cp-btn-primary">註冊</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

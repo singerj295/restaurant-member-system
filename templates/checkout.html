@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}結帳{% endblock %}
+
+{% block content %}
+<h1 class="page-title">💰 結帳</h1>
+
+<div class="custom-card" style="max-width: 600px;">
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-4">
+                <label class="form-label" style="font-weight: 500;">電話搜尋會員</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="phone" class="form-control" placeholder="輸入電話號碼">
+                    <button type="submit" class="btn btn-outline-secondary">搜尋</button>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label" style="font-weight: 500;">選擇會員</label>
+                <select name="member_id" class="form-select">
+                    <option value="">-- 無會員 --</option>
+                    {% for member in members %}
+                    <option value="{{ member.id }}">{{ member.name }} - {{ member.tier }} (餘額: ${{ "%.2f"|format(member.balance) }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label" style="font-weight: 500;">消費金額 ($)</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                    <input type="number" name="original_amount" class="form-control" step="0.01" required>
+                </div>
+            </div>
+            
+            <div class="mb-4 form-check">
+                <input type="checkbox" class="form-check-input" id="useBalance" name="use_balance">
+                <label class="form-check-label" for="useBalance">用儲值餘額扣款</label>
+            </div>
+            
+            <button type="submit" class="btn btn-success btn-lg">
+                <i class="bi bi-check-lg me-2"></i>確認結帳
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
